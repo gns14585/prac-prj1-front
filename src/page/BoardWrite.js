@@ -36,11 +36,12 @@ export function BoardWrite() {
             status: "error",
           })
         } else {
-        toast({
-          description: "저장 중에 문제가 발생하였습니다.",
-          status: "error",
-        })
-      }})
+          toast({
+            description: "저장 중에 문제가 발생하였습니다.",
+            status: "error",
+          })
+        }
+      })
       .finally(() => setIsSubmitting(false));
   }
 
@@ -50,7 +51,7 @@ export function BoardWrite() {
       <Box>
         <FormControl>
           <FormLabel>제목</FormLabel>
-          <Input vlaue={title} onChange={(e) => setTitle(e.target.value)} />
+          <Input vlaue={title} onChange={(e) => setTitle(e.target.value)}/>
         </FormControl>
 
         <FormControl>
@@ -63,7 +64,7 @@ export function BoardWrite() {
 
         <FormControl>
           <FormLabel>작성자</FormLabel>
-          <Input vlaue={writer} onChange={(e) => setWriter(e.target.value)} />
+          <Input vlaue={writer} onChange={(e) => setWriter(e.target.value)}/>
         </FormControl>
         <Button isDisabled={isSubmitting} onClick={handleSubmit} colorScheme="blue">
           저장
