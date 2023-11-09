@@ -1,13 +1,16 @@
 import {Box, Button, FormControl, FormLabel, Input, Textarea, useToast,} from "@chakra-ui/react";
 import {useState} from "react";
 import axios from "axios";
+import {useNavigate} from "react-router-dom";
 
 export function BoardWrite() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [writer, setWriter] = useState("");
-  const toast = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const toast = useToast();
+  const navigate = useNavigate();
 
   function handleSubmit() {
     setIsSubmitting(true);
@@ -23,6 +26,7 @@ export function BoardWrite() {
           description: "새 글이 작성 되었습니다.",
           status: "success",
         })
+        navigate("/");
       })
       .catch((error) => {
         console.log(error.response.status);
