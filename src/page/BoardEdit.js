@@ -12,6 +12,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useImmer } from "use-immer";
 import React, { useEffect } from "react";
 import axios from "axios";
+import { logDOM } from "@testing-library/react";
 
 export function BoardEdit() {
   const [board, updateBoard] = useImmer(null);
@@ -28,6 +29,16 @@ export function BoardEdit() {
 
   if (board === null) {
     return <Spinner />;
+  }
+
+  function handleSubmit() {
+    // 저장버튼 클릭시
+    // put /api/board/edit
+    axios
+      .put("/api/board/edit", board)
+      .then(() => console.log("잘됨"))
+      .catch(() => console.log("안됨"))
+      .finally(() => console.log("끝"));
   }
 
   return (
@@ -70,7 +81,9 @@ export function BoardEdit() {
         />
       </FormControl>
 
-      <Button colorScheme="blue">저장</Button>
+      <Button colorScheme="blue" onClick={handleSubmit}>
+        저장
+      </Button>
       <Button onClick={() => navigate(-1)}>취소</Button>
     </Box>
   );
