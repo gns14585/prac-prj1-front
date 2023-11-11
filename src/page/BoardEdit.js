@@ -4,9 +4,18 @@ import {
   FormControl,
   FormLabel,
   Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   Spinner,
   Textarea,
   Toast,
+  useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useImmer } from "use-immer";
@@ -18,8 +27,10 @@ export function BoardEdit() {
   const [board, updateBoard] = useImmer(null);
   // /edit/:id 는 id값이 넘어옴
   const { id } = useParams();
+  const toast = useToast();
 
   const navigate = useNavigate();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
     axios
@@ -36,9 +47,27 @@ export function BoardEdit() {
     // put /api/board/edit
     axios
       .put("/api/board/edit", board)
-      .then(() => console.log("잘됨"))
-      .catch(() => console.log("안됨"))
-      .finally(() => console.log("끝"));
+      .then(() => {
+        toast({
+          description: board.id + "번 게시글이 수정 되었습니다.",
+          status: "success",
+        });
+        navigate("/board/" + id);
+      })
+      .catch((error) => {
+        if (error.response.data === 400) {
+          toast({
+            description: "수정중에 문제가 발생하였습니다.",
+            status: "error",
+          });
+        } else {
+          toast({
+            description: error.response.data.message,
+            status: "error",
+          });
+        }
+      })
+      .finally(() => onClose(onClose));
   }
 
   return (
@@ -81,10 +110,27 @@ export function BoardEdit() {
         />
       </FormControl>
 
-      <Button colorScheme="blue" onClick={handleSubmit}>
+      <Button colorScheme="blue" onClick={onOpen}>
         저장
       </Button>
       <Button onClick={() => navigate(-1)}>취소</Button>
+
+      {/*저장 모달*/}
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>저장 확인</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>저장 하시겠습니까?</ModalBody>
+
+          <ModalFooter>
+            <Button onClick={onClose}>닫기</Button>
+            <Button onClick={handleSubmit} colorScheme="red">
+              저장
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Box>
   );
 }
