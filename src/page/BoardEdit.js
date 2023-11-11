@@ -19,12 +19,13 @@ import {
 } from "@chakra-ui/react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useImmer } from "use-immer";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { logDOM } from "@testing-library/react";
 
 export function BoardEdit() {
   const [board, updateBoard] = useImmer(null);
+  const [submitting, setSubmitting] = useState(false);
   // /edit/:id 는 id값이 넘어옴
   const { id } = useParams();
   const toast = useToast();
@@ -43,6 +44,7 @@ export function BoardEdit() {
   }
 
   function handleSubmit() {
+    setSubmitting(true);
     // 저장버튼 클릭시
     // put /api/board/edit
     axios
@@ -67,6 +69,7 @@ export function BoardEdit() {
           });
         }
       })
+      .finally(() => setSubmitting(false))
 
       .finally(() => onClose(onClose));
   }
@@ -126,7 +129,11 @@ export function BoardEdit() {
 
           <ModalFooter>
             <Button onClick={onClose}>닫기</Button>
-            <Button onClick={handleSubmit} colorScheme="red">
+            <Button
+              onClick={handleSubmit}
+              colorScheme="red"
+              isDisabled={submitting}
+            >
               저장
             </Button>
           </ModalFooter>
