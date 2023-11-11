@@ -67,6 +67,7 @@ export function BoardEdit() {
           });
         }
       })
+
       .finally(() => onClose(onClose));
   }
 
