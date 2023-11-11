@@ -85,7 +85,9 @@ export function BoardView() {
         <Input value={board.inserted} readOnly />
       </FormControl>
 
-      <Button colorScheme="blue">수정</Button>
+      <Button onClick={() => navigate("/edit/" + id)} colorScheme="blue">
+        수정
+      </Button>
       <Button colorScheme="red" onClick={onOpen}>
         삭제
       </Button>
