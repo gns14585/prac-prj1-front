@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -15,7 +16,13 @@ export function MemberSignup() {
   const [passwordCheck, setPasswordCheck] = useState("");
   const [email, setEmail] = useState("");
 
+  const [idAvailable, setIdAvailable] = useState(false);
+
   let submitAvailable = true;
+
+  if (!idAvailable) {
+    submitAvailable = false;
+  }
 
   if (password != passwordCheck) {
     submitAvailable = false;
@@ -37,12 +44,44 @@ export function MemberSignup() {
       .finally(() => console.log("done"));
   }
 
+  function handleIdCheck() {
+    // 중복체크 할때 필요한 코드
+    // URLSearchParams : 엔코딩 해줌
+    const searchParam = new URLSearchParams();
+    searchParam.set("id", id);
+
+    axios
+      .get("/api/member/check?" + searchParam.toString())
+      // 중복체크는 반대
+      // 있으면 사용하지 못함
+      .then(() => {
+        setIdAvailable(false);
+      })
+      // 없으면 사용 가능
+      .catch((error) => {
+        if (error.response.status === 404) {
+          setIdAvailable(true);
+        }
+      })
+      .finally(() => console.log("끝"));
+  }
+
   return (
     <Box>
       <h1>회원가입</h1>
-      <FormControl>
+      <FormControl isInvalid={!idAvailable}>
         <FormLabel>id</FormLabel>
-        <Input vlaue={id} onChange={(e) => setId(e.target.value)} />
+        <Flex>
+          <Input
+            vlaue={id}
+            onChange={(e) => {
+              setId(e.target.value);
+              setIdAvailable(false);
+            }}
+          />
+          <Button onClick={handleIdCheck}>중복체크</Button>
+        </Flex>
+        <FormErrorMessage>ID 중복체크를 해주세요.</FormErrorMessage>
       </FormControl>
 
       <FormControl isInvalid={password.length == 0}>
