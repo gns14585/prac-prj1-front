@@ -6,21 +6,30 @@ import {
   FormErrorMessage,
   FormLabel,
   Input,
+  useToast,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export function MemberSignup() {
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
   const [passwordCheck, setPasswordCheck] = useState("");
   const [email, setEmail] = useState("");
-
   const [idAvailable, setIdAvailable] = useState(false);
+  const [emailAvailable, setEmailAvailable] = useState(false);
+
+  const toast = useToast();
+  const navigate = useNavigate();
 
   let submitAvailable = true;
 
   if (!idAvailable) {
+    submitAvailable = false;
+  }
+
+  if (!emailAvailable) {
     submitAvailable = false;
   }
 
@@ -39,7 +48,13 @@ export function MemberSignup() {
         password,
         email,
       })
-      .then(() => console.log("good"))
+      .then(() => {
+        toast({
+          description: "회원가입이 완료되었습니다.",
+          status: "success",
+        });
+        navigate("/");
+      })
       .catch(() => console.log("bad"))
       .finally(() => console.log("done"));
   }
@@ -56,14 +71,45 @@ export function MemberSignup() {
       // 있으면 사용하지 못함
       .then(() => {
         setIdAvailable(false);
+        toast({
+          description: "ID가 이미 존재합니다.",
+          status: "warning",
+        });
       })
       // 없으면 사용 가능
       .catch((error) => {
         if (error.response.status === 404) {
           setIdAvailable(true);
+          toast({
+            description: "사용 가능한 ID 입니다.",
+            status: "success",
+          });
         }
+      });
+  }
+
+  function handleEmailCheck() {
+    const searchParams = new URLSearchParams();
+    searchParams.set("email", email);
+
+    axios
+      .get("/api/member/check?" + searchParams)
+      .then(() => {
+        setEmailAvailable(false);
+        toast({
+          description: "이미 사용중인 email 입니다.",
+          status: "warning",
+        });
       })
-      .finally(() => console.log("끝"));
+      .catch((error) => {
+        if (error.response.status === 404) {
+          setEmailAvailable(true);
+          toast({
+            description: "사용 가능한 email 입니다.",
+            status: "success",
+          });
+        }
+      });
   }
 
   return (
@@ -104,13 +150,20 @@ export function MemberSignup() {
         <FormErrorMessage>암호가 다릅니다.</FormErrorMessage>
       </FormControl>
 
-      <FormControl>
+      <FormControl isInvalid={!emailAvailable}>
         <FormLabel>email</FormLabel>
-        <Input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+        <Flex>
+          <Input
+            type="email"
+            value={email}
+            onChange={(e) => {
+              setEmailAvailable(false);
+              setEmail(e.target.value);
+            }}
+          />
+          <Button onClick={handleEmailCheck}>중복체크</Button>
+        </Flex>
+        <FormErrorMessage>email 중복체크를 해주세요.</FormErrorMessage>
       </FormControl>
 
       {/* isDisabled={!submitAvailable} : Input에 값을 넣지 않으면 가입버튼이 안눌리게 처리 */}
