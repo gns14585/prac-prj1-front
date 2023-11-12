@@ -93,7 +93,7 @@ export function MemberSignup() {
     searchParams.set("email", email);
 
     axios
-      .get("/api/member/check?" + searchParams)
+      .get("/api/member/check?" + searchParams.toString())
       .then(() => {
         setEmailAvailable(false);
         toast({
