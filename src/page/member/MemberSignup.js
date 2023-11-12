@@ -55,7 +55,19 @@ export function MemberSignup() {
         });
         navigate("/");
       })
-      .catch(() => console.log("bad"))
+      .catch((error) => {
+        if (error.response.status === 400) {
+          toast({
+            description: "입력값을 확인해주세요",
+            status: "error",
+          });
+        } else {
+          toast({
+            description: "가입중에 오류가 발생하였습니다.",
+            status: "error",
+          });
+        }
+      })
       .finally(() => console.log("done"));
   }
 
