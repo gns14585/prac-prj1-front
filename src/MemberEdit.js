@@ -80,6 +80,10 @@ export function MemberEdit() {
       });
   }
 
+  function handleSubmit() {
+    axios.put("/api/member/edit", { id: member.id, password, email }).then();
+  }
+
   return (
     <Box>
       <h1>{id}님 정보 수정</h1>
@@ -122,7 +126,11 @@ export function MemberEdit() {
         </Flex>
       </FormControl>
 
-      <Button isDisabled={!emailChecked || !passwordChecked} colorScheme="blue">
+      <Button
+        isDisabled={!emailChecked || !passwordChecked}
+        colorScheme="blue"
+        onClick={handleSubmit}
+      >
         수정
       </Button>
       <Button>돌아가기</Button>
