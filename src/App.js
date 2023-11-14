@@ -13,7 +13,7 @@ import { BoardEdit } from "./page/board/BoardEdit";
 import { MemberSignup } from "./page/member/MemberSignup";
 import { MemberList } from "./page/member/MemberList";
 import { MemberView } from "./page/member/MemberView";
-import { MemberEdit } from "./MemberEdit";
+import { MemberEdit } from "./page/member/MemberEdit";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
