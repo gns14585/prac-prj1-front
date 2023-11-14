@@ -23,8 +23,11 @@ export function MemberView() {
   const [member, setMember] = useState(null);
   // /member?id=userid
   const [params] = useSearchParams();
+  // urlSearchParams 은 배열로 구조분해할당 하게됨
+  // list를 하나씩 출력해서 보여주기 떄문 [배열]
 
-  const { onClose, isOpen, onOpen } = useDisclosure();
+  const { isOpen, onOpen, onClose } = useDisclosure(); // 탈퇴 모달창에 대한 HOOK
+
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -32,32 +35,32 @@ export function MemberView() {
     axios
       .get("/api/member?" + params.toString())
       .then((response) => setMember(response.data))
-      .catch((error) => {
-        navigate("/login");
+      .catch(error => {
+        navigate("/login")
         toast({
           description: "권한이 없습니다.",
-          status: "warning",
-        });
-      });
+          status: "warning"
+        })
+      })
   }, []);
 
-  if (member == null) {
+  if (member === null) {
     return <Spinner />;
   }
 
   function handleDelete() {
     // axios
-    // delete /api/member? + params.toString()
+    // delete /api/member?id=userid
 
     // ok => home 이동, toast 띄우기
     // error => toast 띄우기
-    // finally => modal 닫기
+    // final => modal 닫기
 
     axios
-      .get("/api/member?" + params.toString())
+      .delete("/api/member?" + params.toString())
       .then(() => {
         toast({
-          description: "회원 탈퇴하였습니다.",
+          description: "회원 탈퇴 하였습니다.",
           status: "success",
         });
         navigate("/");
@@ -65,9 +68,9 @@ export function MemberView() {
         // TODO : 로그아웃 기능 추가하기
       })
       .catch((error) => {
-        if (error.response.status === 403 || error.response.data === 401) {
+        if (error.response.status === 401 || error.response.status === 403) {
           toast({
-            description: "접근 권한이 없습니다.",
+            description: "권한이 없습니다.",
             status: "error",
           });
         } else {
@@ -89,18 +92,18 @@ export function MemberView() {
       </FormControl>
 
       <FormControl>
-        <FormLabel>닉네임</FormLabel>
+        <FormLabel>별명</FormLabel>
         <Input type="text" value={member.nickName} readOnly />
       </FormControl>
 
       <FormControl>
-        <FormLabel>email</FormLabel>
-        <Input type="email" value={member.email} readOnly />
+        <FormLabel>Email</FormLabel>
+        <Input value={member.email} readOnly />
       </FormControl>
 
       <Button
-        onClick={() => navigate("/member/edits?" + params.toString())}
         colorScheme="blue"
+        onClick={() => navigate("/member/edit?" + params.toString())}
       >
         수정
       </Button>

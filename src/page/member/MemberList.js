@@ -25,9 +25,9 @@ export function MemberList() {
   }
 
   function handleTableRowClick(id) {
-    // /member?id=id
     const params = new URLSearchParams();
     params.set("id", id);
+    // /member?id=id
     navigate("/member?" + params.toString());
   }
 
@@ -38,9 +38,9 @@ export function MemberList() {
           <Tr>
             <Th>id</Th>
             <Th>pw</Th>
-            <Th>email</Th>
             <Th>닉네임</Th>
-            <Th>가입일시</Th>
+            <Th>email</Th>
+            <Th>subscribe</Th>
           </Tr>
         </Thead>
         <Tbody>
@@ -52,8 +52,8 @@ export function MemberList() {
             >
               <Td>{member.id}</Td>
               <Td>{member.password}</Td>
-              <Td>{member.email}</Td>
               <Td>{member.nickName}</Td>
+              <Td>{member.email}</Td>
               <Td>{member.inserted}</Td>
             </Tr>
           ))}
