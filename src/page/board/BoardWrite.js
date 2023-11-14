@@ -14,7 +14,6 @@ import { useNavigate } from "react-router-dom";
 export function BoardWrite() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [writer, setWriter] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false); // 저장 눌렀을때 텀에 대한 useState
 
   const toast = useToast();
@@ -27,7 +26,6 @@ export function BoardWrite() {
       .post("/api/board/add", {
         title, // 제목
         content, // 본문내용
-        writer, // 작성자
       })
       .then(() => {
         // 완료됐을경우
@@ -78,10 +76,6 @@ export function BoardWrite() {
           ></Textarea>
         </FormControl>
 
-        <FormControl>
-          <FormLabel>작성자</FormLabel>
-          <Input vlaue={writer} onChange={(e) => setWriter(e.target.value)} />
-        </FormControl>
         <Button
           isDisabled={isSubmitting} // 저장을 눌렀을 때 연속적으로 눌려지지 않고 일정 텀이 필요할때 사용
           onClick={handleSubmit}
