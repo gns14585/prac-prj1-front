@@ -54,13 +54,16 @@ function CommentList({ boardId }) {
       </CardHeader>
       <CardBody>
         <Stack divider={<StackDivider />} spacing="4">
+          {/* TODO : 댓글 작성 후 re-render */}
           {commentList.map((comment) => (
             <Box>
               <Flex justifyContent="space-between">
                 <Heading size="xs">{comment.memberId}</Heading>
                 <Text fontSize="xs">{comment.inserted}</Text>
               </Flex>
-              <Text pt="2" fontSize="sm">
+
+              {/* sx={{ whiteSpace: "pre-wrap" }} 한번에 두줄이상 댓글 출력 */}
+              <Text sx={{ whiteSpace: "pre-wrap" }} pt="2" fontSize="sm">
                 {comment.comment}
               </Text>
             </Box>
