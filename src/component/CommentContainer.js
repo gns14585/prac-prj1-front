@@ -33,19 +33,7 @@ function CommentForm({ boardId, isSubmitting, onSubmit }) {
   );
 }
 
-function CommentList({ boardId }) {
-  // .map is not a function -> 에러 나오게 되면 useState의 초기값을 [] 로 선언
-  const [commentList, setCommentList] = useState([]);
-
-  useEffect(() => {
-    const params = new URLSearchParams();
-    params.set("id", boardId);
-
-    axios
-      .get("/api/comment/list?" + params.toString())
-      .then((response) => setCommentList(response.data));
-  }, []);
-
+function CommentList({ commentList }) {
   return (
     <Card>
       <CardHeader>
@@ -53,7 +41,6 @@ function CommentList({ boardId }) {
       </CardHeader>
       <CardBody>
         <Stack divider={<StackDivider />} spacing="4">
-          {/* TODO : 댓글 작성 후 re-render */}
           {commentList.map((comment) => (
             <Box>
               <Flex justifyContent="space-between">
@@ -76,6 +63,20 @@ function CommentList({ boardId }) {
 export function CommentContainer({ boardId }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // .map is not a function -> 에러 나오게 되면 useState의 초기값을 [] 로 선언
+  const [commentList, setCommentList] = useState([]);
+
+  useEffect(() => {
+    if (!isSubmitting) {
+      const params = new URLSearchParams();
+      params.set("id", boardId);
+
+      axios
+        .get("/api/comment/list?" + params.toString())
+        .then((response) => setCommentList(response.data));
+    }
+  }, [isSubmitting]);
+
   function handleSubmit(comment) {
     setIsSubmitting(true);
     axios
@@ -90,7 +91,7 @@ export function CommentContainer({ boardId }) {
         isSubmitting={isSubmitting}
         onSubmit={handleSubmit}
       />
-      <CommentList boardId={boardId} />
+      <CommentList boardId={boardId} commentList={commentList} />
     </Box>
   );
 }
