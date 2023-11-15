@@ -22,7 +22,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import axios from "axios";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { DeleteIcon } from "@chakra-ui/icons";
 import { LoginContext } from "./LoginProvider";
 
@@ -87,12 +87,15 @@ function CommentList({ commentList, onDeleteModalOpen, isSubmitting }) {
 
 export function CommentContainer({ boardId }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [id, setId] = useState(0);
 
   // .map is not a function -> 에러 나오게 되면 useState의 초기값을 [] 로 선언
   const [commentList, setCommentList] = useState([]);
 
   const { isOpen, onClose, onOpen } = useDisclosure();
+
+  // const [id, setId] = useState(0);
+  // useRef : 컴포넌트에서 임시로 값을 저장하는 용도로 사용
+  const commentIdRef = useRef(0);
 
   const { isAuthenticated } = useContext(LoginContext);
 
@@ -119,7 +122,7 @@ export function CommentContainer({ boardId }) {
     // TODO : then, catch, finally
 
     setIsSubmitting(true);
-    axios.delete("/api/comment/" + id).finally(() => {
+    axios.delete("/api/comment/" + commentIdRef.current).finally(() => {
       setIsSubmitting(false);
       onClose();
     });
@@ -127,7 +130,8 @@ export function CommentContainer({ boardId }) {
 
   function handleDeleteModelOpen(id) {
     // id를 어딘가 저장
-    setId(id);
+    // setId(id);
+    commentIdRef.current = id;
 
     // 모달 열기
     onOpen();
