@@ -12,9 +12,12 @@ import {
   StackDivider,
   Text,
   Textarea,
+  useToast,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { DeleteIcon } from "@chakra-ui/icons";
+import { useParams } from "react-router-dom";
 
 function CommentForm({ boardId, isSubmitting, onSubmit }) {
   const [comment, setComment] = useState("");
@@ -34,6 +37,25 @@ function CommentForm({ boardId, isSubmitting, onSubmit }) {
 }
 
 function CommentList({ commentList }) {
+  const { id } = useParams();
+  const toast = useToast();
+  function handleDelete() {
+    axios
+      .delete("/api/comment/delete/" + id)
+      .then((response) => {
+        toast({
+          description: "댓글 삭제완료",
+          status: "success",
+        });
+      })
+      .catch((error) => {
+        toast({
+          description: "삭제 중 문제가 발생하였습니다.",
+          status: "error",
+        });
+      });
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -48,10 +70,15 @@ function CommentList({ commentList }) {
                 <Text fontSize="xs">{comment.inserted}</Text>
               </Flex>
 
-              {/* sx={{ whiteSpace: "pre-wrap" }} 한번에 두줄이상 댓글 출력 */}
-              <Text sx={{ whiteSpace: "pre-wrap" }} pt="2" fontSize="sm">
-                {comment.comment}
-              </Text>
+              <Flex justifyContent="space-between">
+                {/* sx={{ whiteSpace: "pre-wrap" }} 한번에 두줄이상 댓글 출력 */}
+                <Text sx={{ whiteSpace: "pre-wrap" }} pt="2" fontSize="sm">
+                  {comment.comment}
+                </Text>
+                <Button size="xs">
+                  <DeleteIcon onClick={() => handleDelete(comment.id)} />
+                </Button>
+              </Flex>
             </Box>
           ))}
         </Stack>
