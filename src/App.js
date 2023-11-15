@@ -6,9 +6,9 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import { HomeLayout } from "./layout/HomeLayout";
-import { BoardList } from "./page/BoardList";
-import { BoardWrite } from "./page/BoardWrite";
-import { BoardView } from "./page/BoardView";
+import { BoardList } from "./page/board/BoardList";
+import { BoardWrite } from "./page/board/BoardWrite";
+import { BoardView } from "./page/board/BoardView";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
