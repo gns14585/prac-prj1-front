@@ -39,9 +39,9 @@ function CommentForm({ boardId, isSubmitting, onSubmit }) {
 function CommentList({ commentList }) {
   const { id } = useParams();
   const toast = useToast();
-  function handleDelete() {
+  function handleDelete(id) {
     axios
-      .delete("/api/comment/delete/" + id)
+      .delete("/api/comment/" + id)
       .then((response) => {
         toast({
           description: "댓글 삭제완료",
