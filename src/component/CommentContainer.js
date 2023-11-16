@@ -89,7 +89,7 @@ function CommentItem({
   return (
     <Box>
       <Flex justifyContent="space-between">
-        <Heading size="xs">{comment.memberId}</Heading>
+        <Heading size="xs">닉네임 : {comment.nickName}</Heading>
         <Text fontSize="xs">{comment.inserted}</Text>
       </Flex>
       <Flex justifyContent="space-between" alignItems="center">
