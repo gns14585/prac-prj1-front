@@ -1,0 +1,270 @@
+import {
+  Box,
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Editable,
+  Flex,
+  Heading,
+  Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Spinner,
+  Stack,
+  StackDivider,
+  Text,
+  Textarea,
+  useDisclosure,
+  useToast,
+} from "@chakra-ui/react";
+import axios from "axios";
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
+import { LoginContext } from "./LoginProvider";
+
+function CommentForm({ boardId, isSubmitting, onSubmit }) {
+  const [comment, setComment] = useState("");
+
+  function handleSubmit() {
+    onSubmit({ boardId, comment });
+  }
+
+  return (
+    <Box>
+      <Textarea value={comment} onChange={(e) => setComment(e.target.value)} />
+      <Button isDisabled={isSubmitting} onClick={handleSubmit}>
+        쓰기
+      </Button>
+    </Box>
+  );
+}
+
+function CommentList({ commentList, onDeleteModalOpen, isSubmitting }) {
+  const { hasAccess } = useContext(LoginContext);
+  const [answer, setAnswer] = useState("");
+  const [id, setId] = useState(null);
+  const [comment, setComment] = useState(null);
+
+  const { isOpen, onClose, onOpen } = useDisclosure();
+
+  function handleUpdate() {
+    // console.log("댓글 수정");
+    axios
+      .put("/api/comment/edit", { id: comment.id, comment })
+      .then((response) => {
+        console.log("good", response.data);
+        onClose(); // 모달 닫기
+      })
+      .catch((error) => console.log("bad", error.response.data));
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <Heading size="md">댓글 리스트</Heading>
+      </CardHeader>
+      <CardBody>
+        <Stack divider={<StackDivider />} spacing="4">
+          {commentList.map((comment) => (
+            <Box key={comment.id}>
+              <Flex justifyContent="space-between">
+                <Heading size="xs">{comment.memberId}</Heading>
+                <Text fontSize="xs">{comment.inserted}</Text>
+              </Flex>
+
+              <Flex justifyContent="space-between" alignItems="center">
+                {/* sx={{ whiteSpace: "pre-wrap" }} 한번에 두줄이상 댓글 출력 */}
+                <Text sx={{ whiteSpace: "pre-wrap" }} pt="2" fontSize="sm">
+                  {comment.comment}
+                </Text>
+
+                {hasAccess(comment.memberId) && (
+                  <>
+                    <Flex>
+                      <Button
+                        isDisabled={isSubmitting}
+                        onClick={() => onDeleteModalOpen(comment.id)}
+                        size="xs"
+                        colorScheme="red"
+                      >
+                        <DeleteIcon />
+                      </Button>
+                      <Button
+                        size="xs"
+                        colorScheme="blue"
+                        onClick={() => {
+                          onOpen();
+                          setComment(comment);
+                        }}
+                      >
+                        <EditIcon />
+                      </Button>
+
+                      {/* 수정 모달 */}
+                      <Modal isOpen={isOpen} onClose={onClose}>
+                        <ModalOverlay />
+                        <ModalContent>
+                          <ModalHeader>수정 확인</ModalHeader>
+                          <ModalCloseButton />
+                          <ModalBody>
+                            <Input
+                              onChange={(e) => setComment(e.target.value)}
+                            />
+                          </ModalBody>
+
+                          <ModalFooter>
+                            <Button onClick={onClose}>닫기</Button>
+                            <Button
+                              isDisabled={isSubmitting}
+                              onClick={handleUpdate}
+                              colorScheme="red"
+                            >
+                              수정
+                            </Button>
+                          </ModalFooter>
+                        </ModalContent>
+                      </Modal>
+                    </Flex>
+                  </>
+                )}
+              </Flex>
+            </Box>
+          ))}
+        </Stack>
+      </CardBody>
+    </Card>
+  );
+}
+
+export function CommentContainer({ boardId }) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // .map is not a function -> 에러 나오게 되면 useState의 초기값을 [] 로 선언
+  const [commentList, setCommentList] = useState([]);
+
+  const { isOpen, onClose, onOpen } = useDisclosure();
+
+  // const [id, setId] = useState(0);
+  // useRef : 컴포넌트에서 임시로 값을 저장하는 용도로 사용
+  const commentIdRef = useRef(0);
+
+  const { isAuthenticated } = useContext(LoginContext);
+
+  const toast = useToast();
+
+  useEffect(() => {
+    if (!isSubmitting) {
+      const params = new URLSearchParams();
+      params.set("id", boardId);
+
+      axios
+        .get("/api/comment/list?" + params.toString())
+        .then((response) => setCommentList(response.data));
+    }
+  }, [isSubmitting]);
+
+  function handleSubmit(comment) {
+    setIsSubmitting(true);
+    axios
+      .post("/api/comment/add", comment)
+      .then(() => {
+        toast({
+          description: "댓글이 등록되었습니다.",
+          status: "success",
+        });
+      })
+      .catch((error) => {
+        toast({
+          description: "댓글이 등록 중 문제가 발생하였습니다.",
+          status: "error",
+        });
+      })
+      .finally(() => setIsSubmitting(false));
+  }
+
+  function handleDelete() {
+    // console.log(id + "번 댓글 삭제");
+    // TODO : then, catch, finally
+
+    setIsSubmitting(true);
+    axios
+      .delete("/api/comment/" + commentIdRef.current)
+      .then(() => {
+        toast({
+          description: "댓글 삭제 되었습니다.",
+          status: "success",
+        });
+      })
+      .catch((error) => {
+        if (error.response.status === 401 || error.response.status === 403) {
+          toast({
+            description: "권한이 없습니다.",
+            status: "warning",
+          });
+        } else {
+          toast({
+            description: "댓글 삭제 중 문제가 발생했습니다.",
+            status: "error",
+          });
+        }
+      })
+      .finally(() => {
+        setIsSubmitting(false);
+        onClose();
+      });
+  }
+
+  function handleDeleteModelOpen(id) {
+    // id를 어딘가 저장
+    // setId(id);
+    commentIdRef.current = id;
+
+    // 모달 열기
+    onOpen();
+  }
+  return (
+    <Box>
+      {isAuthenticated() && (
+        <CommentForm
+          boardId={boardId}
+          isSubmitting={isSubmitting}
+          onSubmit={handleSubmit}
+        />
+      )}
+      <CommentList
+        boardId={boardId}
+        isSubmitting={isSubmitting}
+        commentList={commentList}
+        onDeleteModalOpen={handleDeleteModelOpen}
+        onUpdate={handleUpdate}
+      />
+
+      {/* 삭제 모달 */}
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>삭제 확인</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>삭제 하시겠습니까?</ModalBody>
+
+          <ModalFooter>
+            <Button onClick={onClose}>닫기</Button>
+            <Button
+              isDisabled={isSubmitting}
+              onClick={handleDelete}
+              colorScheme="red"
+            >
+              삭제
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </Box>
+  );
+}
