@@ -4,10 +4,8 @@ import {
   Card,
   CardBody,
   CardHeader,
-  Editable,
   Flex,
   Heading,
-  Input,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -15,7 +13,6 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Spinner,
   Stack,
   StackDivider,
   Text,
@@ -23,9 +20,9 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import axios from "axios";
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
+import axios from "axios";
+import { DeleteIcon } from "@chakra-ui/icons";
 import { LoginContext } from "./LoginProvider";
 
 function CommentForm({ boardId, isSubmitting, onSubmit }) {
@@ -47,22 +44,6 @@ function CommentForm({ boardId, isSubmitting, onSubmit }) {
 
 function CommentList({ commentList, onDeleteModalOpen, isSubmitting }) {
   const { hasAccess } = useContext(LoginContext);
-  const [answer, setAnswer] = useState("");
-  const [id, setId] = useState(null);
-  const [comment, setComment] = useState(null);
-
-  const { isOpen, onClose, onOpen } = useDisclosure();
-
-  function handleUpdate() {
-    // console.log("댓글 수정");
-    axios
-      .put("/api/comment/edit", { id: comment.id, comment })
-      .then((response) => {
-        console.log("good", response.data);
-        onClose(); // 모달 닫기
-      })
-      .catch((error) => console.log("bad", error.response.data));
-  }
 
   return (
     <Card>
@@ -77,61 +58,20 @@ function CommentList({ commentList, onDeleteModalOpen, isSubmitting }) {
                 <Heading size="xs">{comment.memberId}</Heading>
                 <Text fontSize="xs">{comment.inserted}</Text>
               </Flex>
-
               <Flex justifyContent="space-between" alignItems="center">
-                {/* sx={{ whiteSpace: "pre-wrap" }} 한번에 두줄이상 댓글 출력 */}
                 <Text sx={{ whiteSpace: "pre-wrap" }} pt="2" fontSize="sm">
                   {comment.comment}
                 </Text>
 
                 {hasAccess(comment.memberId) && (
-                  <>
-                    <Flex>
-                      <Button
-                        isDisabled={isSubmitting}
-                        onClick={() => onDeleteModalOpen(comment.id)}
-                        size="xs"
-                        colorScheme="red"
-                      >
-                        <DeleteIcon />
-                      </Button>
-                      <Button
-                        size="xs"
-                        colorScheme="blue"
-                        onClick={() => {
-                          onOpen();
-                          setComment(comment);
-                        }}
-                      >
-                        <EditIcon />
-                      </Button>
-
-                      {/* 수정 모달 */}
-                      <Modal isOpen={isOpen} onClose={onClose}>
-                        <ModalOverlay />
-                        <ModalContent>
-                          <ModalHeader>수정 확인</ModalHeader>
-                          <ModalCloseButton />
-                          <ModalBody>
-                            <Input
-                              onChange={(e) => setComment(e.target.value)}
-                            />
-                          </ModalBody>
-
-                          <ModalFooter>
-                            <Button onClick={onClose}>닫기</Button>
-                            <Button
-                              isDisabled={isSubmitting}
-                              onClick={handleUpdate}
-                              colorScheme="red"
-                            >
-                              수정
-                            </Button>
-                          </ModalFooter>
-                        </ModalContent>
-                      </Modal>
-                    </Flex>
-                  </>
+                  <Button
+                    isDisabled={isSubmitting}
+                    onClick={() => onDeleteModalOpen(comment.id)}
+                    size="xs"
+                    colorScheme="red"
+                  >
+                    <DeleteIcon />
+                  </Button>
                 )}
               </Flex>
             </Box>
@@ -144,8 +84,6 @@ function CommentList({ commentList, onDeleteModalOpen, isSubmitting }) {
 
 export function CommentContainer({ boardId }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // .map is not a function -> 에러 나오게 되면 useState의 초기값을 [] 로 선언
   const [commentList, setCommentList] = useState([]);
 
   const { isOpen, onClose, onOpen } = useDisclosure();
@@ -164,13 +102,14 @@ export function CommentContainer({ boardId }) {
       params.set("id", boardId);
 
       axios
-        .get("/api/comment/list?" + params.toString())
+        .get("/api/comment/list?" + params)
         .then((response) => setCommentList(response.data));
     }
   }, [isSubmitting]);
 
   function handleSubmit(comment) {
     setIsSubmitting(true);
+
     axios
       .post("/api/comment/add", comment)
       .then(() => {
@@ -181,7 +120,7 @@ export function CommentContainer({ boardId }) {
       })
       .catch((error) => {
         toast({
-          description: "댓글이 등록 중 문제가 발생하였습니다.",
+          description: "댓글 등록 중 문제가 발생하였습니다.",
           status: "error",
         });
       })
@@ -189,15 +128,12 @@ export function CommentContainer({ boardId }) {
   }
 
   function handleDelete() {
-    // console.log(id + "번 댓글 삭제");
-    // TODO : then, catch, finally
-
     setIsSubmitting(true);
     axios
       .delete("/api/comment/" + commentIdRef.current)
       .then(() => {
         toast({
-          description: "댓글 삭제 되었습니다.",
+          description: "댓글이 삭제되었습니다.",
           status: "success",
         });
       })
@@ -215,16 +151,15 @@ export function CommentContainer({ boardId }) {
         }
       })
       .finally(() => {
-        setIsSubmitting(false);
         onClose();
+        setIsSubmitting(false);
       });
   }
 
-  function handleDeleteModelOpen(id) {
-    // id를 어딘가 저장
+  function handleDeleteModalOpen(id) {
+    // id 를 어딘가 저장
     // setId(id);
     commentIdRef.current = id;
-
     // 모달 열기
     onOpen();
   }
@@ -241,8 +176,7 @@ export function CommentContainer({ boardId }) {
         boardId={boardId}
         isSubmitting={isSubmitting}
         commentList={commentList}
-        onDeleteModalOpen={handleDeleteModelOpen}
-        onUpdate={handleUpdate}
+        onDeleteModalOpen={handleDeleteModalOpen}
       />
 
       {/* 삭제 모달 */}
