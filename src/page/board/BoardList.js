@@ -23,6 +23,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export function BoardList() {
   const [boardList, setBoardList] = useState(null);
+  const [pageInfo, setPageInfo] = useState(null);
 
   const location = useLocation();
 
@@ -30,9 +31,10 @@ export function BoardList() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios
-      .get("/api/board/list?" + params.toString())
-      .then((response) => setBoardList(response.data));
+    axios.get("/api/board/list?" + params.toString()).then((response) => {
+      setBoardList(response.data.boardList);
+      setPageInfo(response.data.pageInfo);
+    });
   }, [location]);
 
   if (boardList === null) {
