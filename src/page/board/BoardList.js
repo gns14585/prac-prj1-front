@@ -14,7 +14,7 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { ChatIcon } from "@chakra-ui/icons";
+import { ArrowLeftIcon, ArrowRightIcon, ChatIcon } from "@chakra-ui/icons";
 import {
   faAngleLeft,
   faAngleRight,
@@ -40,7 +40,7 @@ function Pagination({ pageInfo }) {
           variant="ghost"
           onClick={() => navigate("/?p=" + pageInfo.firstPageNumber)}
         >
-          처음
+          <ArrowLeftIcon />
         </Button>
       )}
 
@@ -80,7 +80,7 @@ function Pagination({ pageInfo }) {
           variant="ghost"
           onClick={() => navigate("/?p=" + pageInfo.lastPageNumber)}
         >
-          마지막
+          <ArrowRightIcon />
         </Button>
       )}
     </Flex>
