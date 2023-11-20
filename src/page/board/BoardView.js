@@ -19,6 +19,7 @@ import {
   Spinner,
   Text,
   Textarea,
+  Tooltip,
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
@@ -31,17 +32,23 @@ import { faHeart as fullHeart } from "@fortawesome/free-solid-svg-icons";
 import * as PropTypes from "prop-types";
 
 function LikeContainer({ like, onClick }) {
+  const { isAuthenticated } = useContext(LoginContext);
+
   if (like === null) {
     return <Spinner />;
   }
 
   return (
-    <Flex>
-      <Button variant="ghost" size="xl" onClick={onClick}>
-        {like.like && <FontAwesomeIcon icon={fullHeart} size="xl" />}
-        {like.like || <FontAwesomeIcon icon={emptyHeart} size="xl" />}
-        <Heading size="xl">{like.countLike}</Heading>
-      </Button>
+    <Flex gap={2}>
+      {/* Tooltip : 해당 버튼 등 속성에 마우스 hover하면 텍스트 출력 */}
+      {/* isDisabled={isAuthenticated()} : 로그아웃 상태에서 hover 했을시 출력 */}
+      <Tooltip isDisabled={isAuthenticated()} hasArrow label={"로그인 하세요."}>
+        <Button variant="ghost" size="xl" onClick={onClick}>
+          {like.like && <FontAwesomeIcon icon={fullHeart} size="xl" />}
+          {like.like || <FontAwesomeIcon icon={emptyHeart} size="xl" />}
+          <Heading size="xl">{like.countLike}</Heading>
+        </Button>
+      </Tooltip>
     </Flex>
   );
 }
