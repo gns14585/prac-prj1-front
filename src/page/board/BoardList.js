@@ -16,6 +16,8 @@ import axios from "axios";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { ChatIcon } from "@chakra-ui/icons";
 import {
+  faAngleLeft,
+  faAngleRight,
   faHeart,
   faHeart as fullHeart,
 } from "@fortawesome/free-solid-svg-icons";
@@ -30,16 +32,25 @@ function Pagination({ pageInfo }) {
     pageNumbers.push(i);
   }
 
-  console.log(pageNumbers);
-  console.log(pageInfo);
-
   return (
     <Box>
+      {pageInfo.prevPageNumber && (
+        <Button onClick={() => navigate("/?p=" + pageInfo.prevPageNumber)}>
+          <FontAwesomeIcon icon={faAngleLeft} />
+        </Button>
+      )}
+
       {pageNumbers.map((pageNumber) => (
         <Button key={pageNumber} onClick={() => navigate("/?p=" + pageNumber)}>
           {pageNumber}
         </Button>
       ))}
+
+      {pageInfo.nextPageNumber && (
+        <Button onClick={() => navigate("/?p=" + pageInfo.nextPageNumber)}>
+          <FontAwesomeIcon icon={faAngleRight} />
+        </Button>
+      )}
     </Box>
   );
 }
