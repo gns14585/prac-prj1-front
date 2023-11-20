@@ -33,25 +33,57 @@ function Pagination({ pageInfo }) {
   }
 
   return (
-    <Box>
+    <Flex>
+      {/* 첫페이지로 이동 */}
+      {pageInfo.firstPageNumber && (
+        <Button
+          variant="ghost"
+          onClick={() => navigate("/?p=" + pageInfo.firstPageNumber)}
+        >
+          처음
+        </Button>
+      )}
+
       {pageInfo.prevPageNumber && (
-        <Button onClick={() => navigate("/?p=" + pageInfo.prevPageNumber)}>
+        <Button
+          variant="ghost"
+          onClick={() => navigate("/?p=" + pageInfo.prevPageNumber)}
+        >
           <FontAwesomeIcon icon={faAngleLeft} />
         </Button>
       )}
 
       {pageNumbers.map((pageNumber) => (
-        <Button key={pageNumber} onClick={() => navigate("/?p=" + pageNumber)}>
+        <Button
+          key={pageNumber}
+          variant={
+            pageNumber === pageInfo.currentPageNumber ? "solid" : "ghost"
+          }
+          onClick={() => navigate("/?p=" + pageNumber)}
+        >
           {pageNumber}
         </Button>
       ))}
 
       {pageInfo.nextPageNumber && (
-        <Button onClick={() => navigate("/?p=" + pageInfo.nextPageNumber)}>
+        <Button
+          variant="ghost"
+          onClick={() => navigate("/?p=" + pageInfo.nextPageNumber)}
+        >
           <FontAwesomeIcon icon={faAngleRight} />
         </Button>
       )}
-    </Box>
+
+      {/* 마지막페이지로 이동 */}
+      {pageInfo.lastPageNumber && (
+        <Button
+          variant="ghost"
+          onClick={() => navigate("/?p=" + pageInfo.lastPageNumber)}
+        >
+          마지막
+        </Button>
+      )}
+    </Flex>
   );
 }
 
