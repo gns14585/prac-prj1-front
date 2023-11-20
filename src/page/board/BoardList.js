@@ -21,14 +21,36 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+function Pagination({ pageInfo }) {
+  const pageNumbers = [];
+
+  const navigate = useNavigate();
+
+  for (let i = pageInfo.startPageNumber; i <= pageInfo.endPageNumber; i++) {
+    pageNumbers.push(i);
+  }
+
+  console.log(pageNumbers);
+  console.log(pageInfo);
+
+  return (
+    <Box>
+      {pageNumbers.map((pageNumber) => (
+        <Button key={pageNumber} onClick={() => navigate("/?p=" + pageNumber)}>
+          {pageNumber}
+        </Button>
+      ))}
+    </Box>
+  );
+}
+
 export function BoardList() {
   const [boardList, setBoardList] = useState(null);
   const [pageInfo, setPageInfo] = useState(null);
 
-  const location = useLocation();
-
   const [params] = useSearchParams();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     axios.get("/api/board/list?" + params.toString()).then((response) => {
@@ -84,18 +106,8 @@ export function BoardList() {
             ))}
           </Tbody>
         </Table>
-        <Flex>
-          <Button onClick={() => navigate("/?p=1")}>1</Button>
-          <Button onClick={() => navigate("/?p=2")}>2</Button>
-          <Button onClick={() => navigate("/?p=3")}>3</Button>
-          <Button onClick={() => navigate("/?p=4")}>4</Button>
-          <Button onClick={() => navigate("/?p=5")}>5</Button>
-          <Button onClick={() => navigate("/?p=6")}>6</Button>
-          <Button onClick={() => navigate("/?p=7")}>7</Button>
-          <Button onClick={() => navigate("/?p=8")}>8</Button>
-          <Button onClick={() => navigate("/?p=9")}>9</Button>
-          <Button onClick={() => navigate("/?p=10")}>10</Button>
-        </Flex>
+
+        <Pagination pageInfo={pageInfo} />
       </Box>
     </Box>
   );
