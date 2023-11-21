@@ -54,21 +54,15 @@ function Pagination({ pageInfo }) {
     <Flex>
       {/* 첫페이지로 이동 */}
       {pageInfo.firstPageNumber && (
-        <Button
-          variant="ghost"
-          onClick={() => navigate("/?p=" + pageInfo.firstPageNumber)}
-        >
+        <PageButton variant="ghost" pageNumber={pageInfo.firstPageNumber}>
           <ArrowLeftIcon />
-        </Button>
+        </PageButton>
       )}
 
       {pageInfo.prevPageNumber && (
-        <Button
-          variant="ghost"
-          onClick={() => navigate("/?p=" + pageInfo.prevPageNumber)}
-        >
+        <PageButton variant="ghost" pageNumber={pageInfo.prevPageNumber}>
           <FontAwesomeIcon icon={faAngleLeft} />
-        </Button>
+        </PageButton>
       )}
 
       {pageNumbers.map((pageNumber) => (
@@ -84,22 +78,16 @@ function Pagination({ pageInfo }) {
       ))}
 
       {pageInfo.nextPageNumber && (
-        <Button
-          variant="ghost"
-          onClick={() => navigate("/?p=" + pageInfo.nextPageNumber)}
-        >
+        <PageButton variant="ghost" pageNumber={pageInfo.nextPageNumber}>
           <FontAwesomeIcon icon={faAngleRight} />
-        </Button>
+        </PageButton>
       )}
 
       {/* 마지막페이지로 이동 */}
       {pageInfo.lastPageNumber && (
-        <Button
-          variant="ghost"
-          onClick={() => navigate("/?p=" + pageInfo.lastPageNumber)}
-        >
+        <PageButton variant="ghost" pageNumber={pageInfo.lastPageNumber}>
           <ArrowRightIcon />
-        </Button>
+        </PageButton>
       )}
     </Flex>
   );
